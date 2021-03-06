@@ -146,3 +146,6 @@ ggplot(dfHappy, aes(x= yearSchool)) + geom_bar(fill="green") + ggtitle("Years in
 ggplot(dfNotHappy, aes(x = yearSchool)) + geom_bar(fill="green") + ggtitle("Years in School vs Unhapiness")+xlab("Years in School")+ylab("Number")
 
 ```
+
+Looking at the we can see that there are a lot more people happy with working around 40 hours a week and a lot less people who aren't happy with it. 
+This would indicate that the average person is more happy to work 40 hours a week and would be less interested in working very little. 
