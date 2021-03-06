@@ -27,8 +27,14 @@ dat %>% mutate(yearsAvg = as.numeric(yearSchool)) %>% na.omit %>% group_by(marit
 
 dat %>% mutate(yearsAvg = as.numeric(yearSchool)) %>% na.omit %>% group_by(marital) %>% ggplot(aes(x = marital, y = mean(yearsAvg, na.rm = TRUE))) + geom_bar(stat = "identity")
 
-
 ```
+
+The graph shows that more years in school indicate being more likely to be married. The table shows that the highest average years is actually
+amoung the people who put "No answer" or were never married. The reason the graph might be slightly misleading is because of the volume of people
+that are married being very high in this data set and how the "No answers" are taken out could cause the Married average to appear higher because the
+the total volume of responses being shown in the graph is less than the responses shown in the table. 
+
+
 
 Question #2
 ```{r}
@@ -39,6 +45,11 @@ df2$yearSchool <- as.numeric(df2$yearSchool)
 df2 %>% group_by(marital) %>% summarize(meanRate = mean(yearSchool, na.rm=TRUE), sdRate = sd(yearSchool, na.rm=TRUE), numRows = n())
 
 ```
+
+The table shows that there are the most people in the married and never married groups, the averages for both of those fall right in the middle of all 
+the other averages which is likely due to having such a large volume it's hard for it to sway and be an outlier, where "No Answer" had only 23 people so
+it's very easy for that average to be influenced and it does end up being the largest at 15.5
+
 
 Question #3
 ```{r}
@@ -60,6 +71,11 @@ ggplot(dfNotHappy, aes(x=marital)) + geom_bar(fill="green")  + ggtitle("Unhappin
 mosaicplot(dfHappy$happiness~dfHappy$marital, shade=TRUE, las=1, main="Happy vs Marital Status", xlab="Happiness", ylab="Marital Status")
 mosaicplot(dfNotHappy$happiness~dfNotHappy$marital, shade=TRUE, las=1, main="Unhappy vs Marital Status", xlab="Happiness", ylab="Marital Status")
 ```
+
+The graphs show the happy and happiness compared to the marital status of the person. There are a lot more happy people than unhappy which means that 
+even if people ended up getting divorced or never married, they are happy with their decision. The last 2 graphs show that the most happy people are the ones with a marital status of married, while the other groups (Divorced, Never Married, Seperated, and Widowed) all have larger Pretty Happy amounts than Very Happy, so 
+although they are still happy, they tend to not be as happy as married people. 
+
 
 Question #4
 ```{r}
@@ -102,6 +118,10 @@ ggplot(dfdNotHappy, aes(x=party)) + geom_bar(fill="blue") + ggtitle("Unhappy Dem
 
 ```
 
+These graphs show the happiness and unhappiness of the different parties, which are Democrats, Republicans, and Independents. The republicans actually have
+the best happy to not happy ratio at 10 happy to every 1 not happy, the democrats and independents are just slightly behind with a ratio of around 6 to 1. 
+
+
 Question #5
 ```{r}
 df5 <- as.data.frame(dat)
@@ -111,6 +131,10 @@ df5$yearSchool <- as.numeric(df5$yearSchool)
 
 ggplot(data = df5, aes(x = marital, y = yearSchool)) + geom_boxplot() + ggtitle("Education vs Marital") + xlab("Marital Status") + ylab("Education")
 ```
+
+Education doesn't have much of an effect on the marital status of someone. All of the educations based off marital status's are very close so it's hard to say
+there is any trend, but the best conclusion would be that education isn't affecting whether people are getting married and there are other factors influencing
+that. 
 
 Question #6a
 ```{r}
@@ -128,6 +152,9 @@ ggplot(dfHappy, aes(x= hours)) + geom_bar(fill="green") + ggtitle("Hours Worked 
 ggplot(dfNotHappy, aes(x=hours)) + geom_bar(fill="green")  + ggtitle("Hours Worked vs Unhapiness")+xlab("Hours")+ylab("Number")
 
 ```
+
+Looking at the we can see that there are a lot more people happy with working around 40 hours a week and a lot less people who aren't happy with it. 
+This would indicate that the average person is more happy to work 40 hours a week and would be less interested in working very little. 
 
 Question #6b
 ```{r}
@@ -147,5 +174,7 @@ ggplot(dfNotHappy, aes(x = yearSchool)) + geom_bar(fill="green") + ggtitle("Year
 
 ```
 
-Looking at the we can see that there are a lot more people happy with working around 40 hours a week and a lot less people who aren't happy with it. 
-This would indicate that the average person is more happy to work 40 hours a week and would be less interested in working very little. 
+This shows that there are a lot more people happy with all levels of education that there are people that are unhappy. For reference the graph shows 
+about 15,000 people for 12 years and happy, but only 2,000 people for 12 years and unhappy. That would mean that for every 17,000 people, 15,000 end up being 
+happy, which is a very high amount. There are similar trends and ratio's amoung all other years of education when looking at happy vs unhappy as well. 
+
