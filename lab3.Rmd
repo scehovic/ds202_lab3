@@ -1,0 +1,148 @@
+---
+title: "lab3"
+author: "Ryan Scehovic"
+date: "3/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+dat <- readxl::read_xls('/Users/ryans/OneDrive/Desktop/DS202/lab3/GSS.xls')
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+
+dat <- dat %>% rename(year = `Gss year for this respondent`, id = `Respondent id number`, hours = `Number of hours usually work a week`, 
+                      marital = `Marital status`, yearSchool = `Highest year of school completed`, sex = `Respondents sex`, 
+                      party = `Political party affiliation`, happiness = `General happiness`, ballotUsed = `Ballot used for interview`)
+```
+
+Question #1
+```{r}
+dat %>% mutate(yearsAvg = as.numeric(yearSchool)) %>% na.omit %>% group_by(marital) %>% summarize(yearsAvg = mean(yearsAvg, na.rm = TRUE)) 
+
+dat %>% mutate(yearsAvg = as.numeric(yearSchool)) %>% na.omit %>% group_by(marital) %>% ggplot(aes(x = marital, y = mean(yearsAvg, na.rm = TRUE))) + geom_bar(stat = "identity")
+
+
+```
+
+Question #2
+```{r}
+df2 <- as.data.frame(dat)
+df2 <- filter(df2, yearSchool != "Don't know" & yearSchool != 'No answer' & yearSchool != "NA" & !is.na(yearSchool))
+df2$yearSchool <- as.numeric(df2$yearSchool)
+
+df2 %>% group_by(marital) %>% summarize(meanRate = mean(yearSchool, na.rm=TRUE), sdRate = sd(yearSchool, na.rm=TRUE), numRows = n())
+
+```
+
+Question #3
+```{r}
+df3 <- as.data.frame(dat)
+str(df3)
+
+dfHappy <- df3 %>% group_by(marital) %>% filter(happiness=="Pretty happy" | happiness=="Very happy") %>% filter(marital!="No answer")
+dfNotHappy <- df3 %>% group_by(marital) %>% filter(happiness=="Not too happy") %>% filter(marital!="No answer")
+
+notHappy <- dfNotHappy %>% group_by(marital) %>% summarize(toalUnhappy = n())
+notHappy
+
+happy <- dfHappy %>% group_by(marital) %>% summarize(totalHappy = n())
+happy
+
+ggplot(dfHappy, aes(x=marital)) + geom_bar(fill="green") + ggtitle("Happiness vs Marital Status")+xlab("Marital Status")+ylab("Number")
+ggplot(dfNotHappy, aes(x=marital)) + geom_bar(fill="green")  + ggtitle("Unhappiness vs Marital Status")+xlab("Marital Status")+ylab("Number")
+
+mosaicplot(dfHappy$happiness~dfHappy$marital, shade=TRUE, las=1, main="Happy vs Marital Status", xlab="Happiness", ylab="Marital Status")
+mosaicplot(dfNotHappy$happiness~dfNotHappy$marital, shade=TRUE, las=1, main="Unhappy vs Marital Status", xlab="Happiness", ylab="Marital Status")
+```
+
+Question #4
+```{r}
+unique(dfHappy$party)
+
+dfiHappy<- dfHappy %>% group_by(marital) %>% filter(party=="Independent" | party=="Ind,near rep" | party=="Ind,near dem")
+dfiHappy
+
+i1 <- dfiHappy %>% summarize(totalHappyI = n())
+i1
+ggplot(dfiHappy, aes(x=party)) + geom_bar(fill="purple") + ggtitle("Happy Independents")+xlab("Party")+ylab("Count")
+
+
+dfiNotHappy <- dfNotHappy %>% group_by(marital) %>% filter(party=="Independent" | party=="Ind,near rep" | party=="Ind,near dem")
+dfiNotHappy
+
+i2 <- dfiNotHappy %>% summarize(totalNotHappyI = n())
+i2
+ggplot(dfiNotHappy, aes(x=party)) + geom_bar(fill="purple") + ggtitle("Unhappy Independents")+xlab("Party")+ylab("Count")
+
+dfrHappy <- dfHappy %>% group_by(marital) %>% filter(party=="Strong republican" | party=="Not str republican") 
+r1 <- dfrHappy %>% summarize(totalHappyR = n())
+r1
+ggplot(dfrHappy, aes(x=party)) + geom_bar(fill="red") + ggtitle("Happy Republicans")+xlab("Party")+ylab("Count")
+
+dfrNotHappy <- dfNotHappy %>% group_by(marital) %>% filter(party=="Strong republican" | party=="Not str republican")
+r2 <- dfrNotHappy %>% summarize(totalNotHappyR = n())
+r2
+ggplot(dfrNotHappy, aes(x=party)) + geom_bar(fill="red") + ggtitle("Unhappy Republicans")+xlab("Party")+ylab("Count")
+
+dfdHappy <- dfHappy %>% group_by(marital) %>% filter(party=="Strong democrat" | party=="Not str democrat")
+d1 <- dfdHappy %>% summarize(totalHappyR = n())
+d1
+ggplot(dfdHappy, aes(x=party)) + geom_bar(fill="blue") + ggtitle("Happy Democrats")+xlab("Party")+ylab("Count")
+
+dfdNotHappy <- dfNotHappy %>% group_by(marital) %>% filter(party=="Strong democrat" | party=="Not str democrat")
+d2 <- dfdNotHappy %>% summarize(totalNotHappyR = n())
+d2
+ggplot(dfdNotHappy, aes(x=party)) + geom_bar(fill="blue") + ggtitle("Unhappy Democrats")+xlab("Party")+ylab("Count")
+
+```
+
+Question #5
+```{r}
+df5 <- as.data.frame(dat)
+df5 <- filter(df5, !is.na(yearSchool) & yearSchool != 'No answer' & yearSchool != "Don't know" & yearSchool != "NA" )
+unique(df5$yearSchool)
+df5$yearSchool <- as.numeric(df5$yearSchool)
+
+ggplot(data = df5, aes(x = marital, y = yearSchool)) + geom_boxplot() + ggtitle("Education vs Marital") + xlab("Marital Status") + ylab("Education")
+```
+
+Question #6a
+```{r}
+df6 <- select(dat, hours, happiness)
+df6$hours <- as.numeric(df6$hours)
+
+dfHappy <- df3 %>% group_by(hours) %>% filter(happiness=="Pretty happy" | happiness=="Very happy") %>% filter(hours!="Not applicable" & hours!="No answer")
+dfNotHappy <- df3 %>% group_by(hours) %>% filter(happiness=="Not too happy") %>% filter(hours !="Not applicable" & hours!="No answer")
+
+notHappy <- dfNotHappy %>% group_by(hours) %>% summarize(totalUnhappy = n())
+
+happy <- dfHappy %>% group_by(hours) %>% summarize(totalHappy = n())
+
+ggplot(dfHappy, aes(x= hours)) + geom_bar(fill="green") + ggtitle("Hours Worked vs Happiness")+xlab("Hours")+ylab("Number")
+ggplot(dfNotHappy, aes(x=hours)) + geom_bar(fill="green")  + ggtitle("Hours Worked vs Unhapiness")+xlab("Hours")+ylab("Number")
+
+```
+
+Question #6b
+```{r}
+df6 <- select(dat, yearSchool, happiness)
+df6$yearSchool <- as.numeric(df6$yearSchool)
+
+dfHappy <- df3 %>% group_by(yearSchool) %>% filter(happiness=="Pretty happy" | happiness=="Very happy") %>% filter(yearSchool != 'No answer' & yearSchool != "Don't know" & yearSchool != "NA" )
+
+dfNotHappy <- df3 %>% group_by(yearSchool) %>% filter(happiness=="Not too happy") %>% filter(yearSchool != 'No answer' & yearSchool != "Don't know" & yearSchool != "NA" )
+
+notHappy <- dfNotHappy %>% group_by(yearSchool) %>% summarize(totalUnhappy = n())
+
+happy <- dfHappy %>% group_by(yearSchool) %>% summarize(totalHappy = n())
+
+ggplot(dfHappy, aes(x= yearSchool)) + geom_bar(fill="green") + ggtitle("Years in School vs Happiness")+xlab("Years in School")+ylab("Number")
+ggplot(dfNotHappy, aes(x = yearSchool)) + geom_bar(fill="green") + ggtitle("Years in School vs Unhapiness")+xlab("Years in School")+ylab("Number")
+
+```
